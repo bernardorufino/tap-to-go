@@ -22,7 +22,7 @@ class Server < Sinatra::Base
     key = params['key']
     value = params['value']
     if not key or not value
-        "Call /create?key=<KEY>&value=<VALUE>"
+        [400, "Call /create?key=<KEY>&value=<VALUE>"]
     end
     db = load_db
     db[key] = value
