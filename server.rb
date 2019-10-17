@@ -6,6 +6,22 @@ require 'json'
 class Server < Sinatra::Base
   DB_FILE = 'server.db'
 
+  configure do
+    enable :cross_origin
+  end
+
+  before do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['X-XSS-Protection'] = '0'
+  end
+
+  options '*' do
+    response.headers["Allow"] = "GET, PUT, POST, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    200
+  end
+
   # GET /cc?pin=<PIN>
   #
   # Waits for CC information from one of the devices pooling
@@ -20,7 +36,7 @@ class Server < Sinatra::Base
     db['pending_requests'] << pin
     save_db(db)
 
-    deadline = Time.now + 15
+    deadline = Time.now + 30
     while Time.now <= deadline
       db = load_db
       cc = db.fetch('requests', {})[pin]
